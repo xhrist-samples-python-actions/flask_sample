@@ -19,13 +19,20 @@ jobs:
           echo "*********************************************"
           echo "Start Process ..."
           echo "*********************************************"
+
+    - name: Docker login
+      run: docker login -u ${{ secrets.DOCKERHUB_USER }} -p ${{ secrets.DOCKERHUB_PASS }}
           
     - name: Build the Docker image
-      run: |
-        docker login -u ${{ secrets.DOCKERHUB_USER }} 
-        echo "${{ secrets.DOCKERHUB_PASS }}" | docker login --username ${{ secrets.DOCKERHUB_USER }} --password-stdin
+      run: |       
+
+        RANDOM_INPUT=$(uuidgen)
+        RANDOM_SHA=$(echo -n "$RANDOM_INPUT" | sha256sum | awk '{print $1}')
         
-        docker build -f docker/Dockerfile -t ${{ secrets.IMAGE }} .
+        docker build -f docker/Dockerfile -t ${{ secrets.IMAGE }} .        
+
+        docker tag ${{ secrets.IMAGE }}:latest ${{ secrets.IMAGE }}:$RANDOM_SHA
+        docker push ${{ secrets.image }}:$RANDOM_SHA
         
         docker push ${{ secrets.IMAGE }}:latest
 
