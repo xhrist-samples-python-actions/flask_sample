@@ -1,5 +1,5 @@
 # Stage 1: Build Frontend
-FROM node:18-alpine as build
+FROM node:22-alpine as build
 
 WORKDIR /app/frontend
 
@@ -9,6 +9,12 @@ RUN npm install
 
 # Copy the rest of the frontend code
 COPY frontend/ .
+
+RUN mkdir -p /app/backend/static
+
+RUN chmod -R 0777 /app/backend/static
+
+RUN chmod -R 0777 /app/backend
 
 # Build the frontend
 # Note: vite.config.js builds to ../backend/static, which resolves to /app/backend/static inside the container
