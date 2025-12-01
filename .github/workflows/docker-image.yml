@@ -1,0 +1,36 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Start Process
+      run: |
+          echo "*********************************************"
+          echo "Start Process ..."
+          echo "*********************************************"
+          
+    - name: Build the Docker image
+      run: |
+        docker login -u ${{ secrets.DOCKERHUB_USER }} 
+        echo "${{ secrets.DOCKERHUB_PASS }}" | docker login --username ${{ secrets.DOCKERHUB_USER }} --password-stdin
+        
+        docker build -f docker/Dockerfile -t ${{ secrets.IMAGE }} .
+        
+        docker push ${{ secrets.IMAGE }}:latest
+
+    - name: Finish Process
+      run: |
+          echo "*********************************************"
+          echo "Finish Process ..."
+          echo "*********************************************"
